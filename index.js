@@ -48,7 +48,7 @@ app.get("/template/:id", async (req, res) => {
 
 const getFileUrlOrDownload = async (key, filePath) => {
   if (fs.existsSync(filePath)) {
-    return `http://localhost:${port}/files/${key}`;
+    return `https://gold-tiny-termite.cyclic.app/files/${key}`;
   }
   // Download the file from S3
   const url = `https://${bucketName}.s3.amazonaws.com/Content/${key}`;
@@ -58,7 +58,7 @@ const getFileUrlOrDownload = async (key, filePath) => {
   fs.writeFileSync(filePath, fileData);
 
   // Return local URL
-  return `http://localhost:${port}/files/${key}`;
+  return `https://gold-tiny-termite.cyclic.app/files/${key}`;
 };
 
 const downloadFileFromS3 = async (url) => {
