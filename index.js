@@ -33,6 +33,19 @@ app.get("/project/:id", async (req, res) => {
   }
 });
 
+app.get("/html-project/:id", async (req, res) => {
+  const projectId = req.params.id;
+  const projectKey = `Website${projectId}.html`;
+
+  const url = `https://${bucketName}.s3.amazonaws.com/Content/${projectKey}`;
+  try {
+    const htmlFile = await downloadFileFromS3(url);
+    res.send(htmlFile);
+  } catch (err) {
+    res.status(404).send(`Project file with ID ${templateId} not found`);
+  }
+});
+
 app.get("/template/:id", async (req, res) => {
   const templateId = req.params.id;
   const templateKey = `Bulkpe${templateId}.html`;
@@ -82,7 +95,7 @@ app.delete("/delete-downloads", (req, res) => {
 
 const getFileUrlOrDownload = async (key, filePath) => {
   if (fs.existsSync(filePath)) {
-    return `https://gold-tiny-termite.cyclic.app/files/${key}`;
+    return `http:localhost:4000/files/${key}`;
   }
   // Download the file from S3
   const url = `https://${bucketName}.s3.amazonaws.com/Content/${key}`;
@@ -92,7 +105,7 @@ const getFileUrlOrDownload = async (key, filePath) => {
   fs.writeFileSync(filePath, fileData);
 
   // Return local URL
-  return `https://gold-tiny-termite.cyclic.app/files/${key}`;
+  return `http:localhost:4000/files/${key}`;
 };
 
 const downloadFileFromS3 = async (url) => {
