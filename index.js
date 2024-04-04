@@ -46,6 +46,40 @@ app.get("/template/:id", async (req, res) => {
   }
 });
 
+app.get("/html-template/:id", async (req, res) => {
+  const templateId = req.params.id;
+  const templateKey = `Bulkpe${templateId}.html`;
+  //   const filePath = path.join(downloadedFilesDir, templateKey);
+  const url = `https://${bucketName}.s3.amazonaws.com/Content/${templateKey}`;
+  try {
+    const fileUrl = await downloadFileFromS3(url);
+    res.send(fileUrl);
+  } catch (err) {
+    res.status(404).send(`Template file with ID ${templateId} not found`);
+  }
+});
+
+app.delete("/delete-downloads", (req, res) => {
+  const downloadedFilesDir = path.join(__dirname, "downloaded_files");
+
+  // Check if the directory exists
+  if (fs.existsSync(downloadedFilesDir)) {
+    // Remove the directory recursively
+    fs.rm(downloadedFilesDir, { recursive: true, force: true }, (err) => {
+      if (err) {
+        console.error("Error deleting downloaded_files directory:", err);
+        return res.status(500).json({ error: "Failed to delete downloads" });
+      }
+
+      console.log("downloaded_files directory deleted successfully");
+      return res.status(200).json({ message: "Downloads deleted" });
+    });
+  } else {
+    console.log("downloaded_files directory does not exist");
+    return res.status(200).json({ message: "No downloads to delete" });
+  }
+});
+
 const getFileUrlOrDownload = async (key, filePath) => {
   if (fs.existsSync(filePath)) {
     return `https://gold-tiny-termite.cyclic.app/files/${key}`;
